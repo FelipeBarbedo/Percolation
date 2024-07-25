@@ -1,8 +1,11 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
+import java.util.Arrays;
+
 public class Percolation {
 
     private WeightedQuickUnionUF gridConnectionTree;
+    private int openSites;
     private int[][] grid;
     private int n;
 
@@ -10,45 +13,66 @@ public class Percolation {
     public Percolation(int n) {
         gridConnectionTree = new WeightedQuickUnionUF((n * n) + 2);
         grid = new int[n][n];
+        openSites = 0;
         this.n = n;
 
         for (int row = 0; row < grid.length; row++)
-            for (int col = 0; col < grid[row].length; col++)
-                grid[row][col] = -1;
+            Arrays.fill(grid[row], 0);
     }
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
-        boolean up = false, down = false;
-        boolean left = false, right = false;
+        int p;
 
-        if (row > 0)
-            up = this.isFull(row - 1, col);
+        if (this.grid[row][col] == 0) {
+            p = row * this.n + col;
+            this.grid[row][col] = 1;
+        } else {
+            return;
+        }
 
-        if (row < n)
-            down = this.isFull(row + 1, col);
+        // first row
+        if (row == 0) {
+            int q = this.n;
+            gridConnectionTree.union(p, q);
+        }
 
-        if (col > 0)
-            left = this.isFull(row, col - 1);
+        // last row
+        if (row == this.n - 1) {
+            int q = this.n * this.n + 1;
+            gridConnectionTree.union(p, q);
+        }
 
-        if (col < n)
-            right = this.isFull(row, col + 1);
+        // up
+        if (row > 0) {
+            if (this.isOpen(row - 1, col)) {
+                int q = (row - 1) * this.n + col;
+                gridConnectionTree.union(p, q);
+            }
+        }
 
-        if (row == 0)
-            gridConnectionTree.union(col, this.n + 1);
+        // down
+        if (row < this.n - 1) {
+            if (this.isOpen(row + 1, col)) {
+                int q = (row + 1) * this.n + col;
+                gridConnectionTree.union(p, q);
+            }
+        }
 
-        if (up) {
-            gridConnectionTree.union(row * (n + 1) + col, (row - 1) * (n + 1) + col);
-            grid[row][col] = 1;
-        } else if (down) {
-            gridConnectionTree.union(row * (n + 1) + col, (row + 1) * (n + 1) + col);
-            grid[row][col] = 1;
-        } else if (left) {
-            gridConnectionTree.union(row * (n + 1) + col, row * (n + 1) + (col - 1));
-            grid[row][col] = 1;
-        } else if (right) {
-            gridConnectionTree.union(row * (n + 1) + col, row * (n + 1) + (col + 1));
-            grid[row][col] = 1;
+        // left
+        if (col > 0) {
+            if (this.isOpen(row, col - 1)) {
+                int q = row * this.n + (col - 1);
+                gridConnectionTree.union(p, q);
+            }
+        }
+
+        // right
+        if (col < this.n - 1) {
+            if (this.isOpen(row, col + 1)) {
+                int q = row * this.n + (col + 1);
+                gridConnectionTree.union(p, q);
+            }
         }
     }
 
@@ -59,23 +83,19 @@ public class Percolation {
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        return grid[row][col] == 1;
+        // calculate the number that represents the element (row, col) on the gridConnectionTree
+        int p = row * this.n + col;
+
+        return gridConnectionTree.find(this.n) == gridConnectionTree.find(p);
     }
 
     // returns the number of open sites
     public int numberOfOpenSites() {
-        int count = 0;
-
-        for (int row = 0; row < grid.length; row++)
-            for (int col = 0; col < grid[row].length; col++)
-                if (this.isOpen(row, col))
-                    count++;
-
-        return count;
+        return this.openSites;
     }
 
     // does the system percolate?
     public boolean percolates() {
-        return gridConnectionTree.find(this.n + 1) == gridConnectionTree.find(this.n + 2);
+        return gridConnectionTree.find(this.n) == gridConnectionTree.find(this.n + 1);
     }
 }
