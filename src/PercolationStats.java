@@ -1,8 +1,10 @@
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
 
+    private static final double CONFIDENCE_95 = 1.96;
     private final double[] percolationThresholds;
 
     // perform independent trials on an n-by-n grid
@@ -10,7 +12,6 @@ public class PercolationStats {
 
         if (n <= 0 || trials <= 0)
             throw new IllegalArgumentException();
-
 
         percolationThresholds = new double[trials];
         Percolation percolate;
@@ -20,8 +21,8 @@ public class PercolationStats {
 
             while (!percolate.percolates()) {
                 int randomSiteNumber = StdRandom.uniformInt(n * n);
-                int row = randomSiteNumber / n;
-                int col = randomSiteNumber % n;
+                int row = (randomSiteNumber / n) + 1;
+                int col = (randomSiteNumber % n) + 1;
 
                 percolate.open(row, col);
             }
@@ -32,23 +33,12 @@ public class PercolationStats {
 
     // sample mean of percolation threshold
     public double mean() {
-        double sum = 0.0;
-
-        for (double threshold : percolationThresholds)
-            sum += threshold;
-
-        return sum / percolationThresholds.length;
+        return StdStats.mean(percolationThresholds);
     }
 
     // sample standard deviation of percolation threshold
     public double stddev() {
-        double mean = this.mean();
-        double sum = 0.0;
-
-        for (double threshold : percolationThresholds)
-            sum += Math.pow((threshold - mean), 2);
-
-        return Math.sqrt(sum / (percolationThresholds.length - 1));
+        return StdStats.stddev(percolationThresholds);
     }
 
     // low endpoint of 95% confidence interval
@@ -56,7 +46,7 @@ public class PercolationStats {
         double stdDeviation = this.stddev();
         double mean = this.mean();
 
-        return mean - ((1.96 * stdDeviation) / Math.sqrt(percolationThresholds.length));
+        return mean - ((CONFIDENCE_95 * stdDeviation) / Math.sqrt(percolationThresholds.length));
     }
 
     // high endpoint of 95% confidence interval
@@ -64,7 +54,7 @@ public class PercolationStats {
         double stdDeviation = this.stddev();
         double mean = this.mean();
 
-        return mean + ((1.96 * stdDeviation) / Math.sqrt(percolationThresholds.length));
+        return mean + ((CONFIDENCE_95 * stdDeviation) / Math.sqrt(percolationThresholds.length));
     }
 
     // test client (see below)
