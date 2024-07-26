@@ -1,15 +1,13 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
-import java.util.Arrays;
-
 public class Percolation {
 
-    private WeightedQuickUnionUF gridConnectionTree;
+    private final WeightedQuickUnionUF gridConnectionTree;
     private int openSites;
-    private int[][] grid;
-    private int n;
-    private int virtualUpSite;
-    private int virtualDownSite;
+    private final int[][] grid;
+    private final int n;
+    private final int virtualUpSite;
+    private final int virtualDownSite;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -21,7 +19,8 @@ public class Percolation {
         this.n = n;
 
         for (int row = 0; row < grid.length; row++)
-            Arrays.fill(grid[row], 0);
+            for (int col = 0; col < grid.length; col++)
+                grid[row][col] = 0;
     }
 
     // opens the site (row, col) if it is not open already
@@ -38,14 +37,12 @@ public class Percolation {
 
         // first row
         if (row == 0) {
-            int q = virtualUpSite;
-            gridConnectionTree.union(p, q);
+            gridConnectionTree.union(p, virtualUpSite);
         }
 
         // last row
         if (row == this.n - 1) {
-            int q = virtualDownSite;
-            gridConnectionTree.union(p, q);
+            gridConnectionTree.union(p, virtualDownSite);
         }
 
         // up

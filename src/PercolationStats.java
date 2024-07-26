@@ -3,13 +3,17 @@ import edu.princeton.cs.algs4.StdRandom;
 
 public class PercolationStats {
 
-    private Percolation percolate;
-    private double[] percolationThresholds;
-    private double mean;
+    private final double[] percolationThresholds;
 
     // perform independent trials on an n-by-n grid
     public PercolationStats(int n, int trials) {
+
+        if (n <= 0 || trials <= 0)
+            throw new IllegalArgumentException();
+
+
         percolationThresholds = new double[trials];
+        Percolation percolate;
 
         for (int i = 0; i < trials; i++) {
             percolate = new Percolation(n);
@@ -66,7 +70,8 @@ public class PercolationStats {
     // test client (see below)
     public static void main(String[] args) {
 
-        PercolationStats stats = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        // PercolationStats stats = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        PercolationStats stats = new PercolationStats(200, 100);
 
         StdOut.println("mean \t\t\t\t\t= " + stats.mean());
         StdOut.println("stddev \t\t\t\t\t= " + stats.stddev());
