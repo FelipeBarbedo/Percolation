@@ -70,8 +70,8 @@ public class PercolationStats {
     // test client (see below)
     public static void main(String[] args) {
 
-        // PercolationStats stats = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        PercolationStats stats = new PercolationStats(200, 100);
+        PercolationStats stats = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        // PercolationStats stats = new PercolationStats(200, 100);
 
         StdOut.println("mean \t\t\t\t\t= " + stats.mean());
         StdOut.println("stddev \t\t\t\t\t= " + stats.stddev());
